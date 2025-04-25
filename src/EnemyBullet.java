@@ -1,19 +1,19 @@
 import java.awt.*;
 
-public class Laser {
+public class EnemyBullet {
     int x, y;
 
-    public Laser(int x, int y) {
+    public EnemyBullet(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
     public void update() {
-        y -= 10;
+        y += 5;
     }
 
     public void draw(Graphics g) {
-        g.setColor(Color.YELLOW);
+        g.setColor(Color.PINK);
         g.fillRect(x, y, 5, 10);
     }
 
