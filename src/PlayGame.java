@@ -22,13 +22,14 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
     boolean capturingEnemySwooping = false; // Flag to prevent multiple simultaneous swoops
     String message = "";                    // In-game message (like "Wave Complete")
     long messageTimer = 0;                  // Timer for how long message is shown
-
+    final static int BOARD_WIDTH = 800;
+    final static int BOARD_HEIGHT = 600;
     /**
      * Constructor to set up the game panel and initialize game objects.
      */
     public PlayGame() {
         this.setFocusable(true);
-        this.setPreferredSize(new Dimension(800, 600));
+        this.setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT));
         this.setBackground(Color.BLACK);
         this.addKeyListener(this);
 
@@ -51,9 +52,23 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
         for (int i = 0; i < wave + 1; i++) {
             int SwoopSpawnX = 100 + i * 150;
             int SwoopSpawnY = 220;
-            System.out.println(" - Enemy at x=" + SwoopSpawnX + ", y=" + SwoopSpawnY);
-            enemies.add(factory.createEnemy("swooping", SwoopSpawnX, SwoopSpawnY, hero));
-            // You can add other enemy types here (e.g., shooting, capturing)
+            int ShootSpawnX = 100 + (i-1) * 150;
+            int ShootSpawnY = 120;
+            if (i % 2 == 0) {
+                if(SwoopSpawnX < BOARD_WIDTH - 50)
+                {
+                    System.out.println(" - SwoopEnemy at x=" + SwoopSpawnX + ", y=" + SwoopSpawnY);
+                    enemies.add(factory.createEnemy("swooping", SwoopSpawnX, SwoopSpawnY, hero, enemyBullets));
+                }
+
+            } else if (i % 2 == 1)
+            {
+                if(SwoopSpawnX < BOARD_WIDTH - 50)
+                {
+                    System.out.println(" - ShootEnemy at x= " + ShootSpawnX + ", y= " + ShootSpawnY);
+                    enemies.add(EnemyFactory.createEnemy("shooting", ShootSpawnX, ShootSpawnY, hero, enemyBullets));
+                }
+            }
         }
     }
 
@@ -105,6 +120,7 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
                 if (enemy instanceof SwoopingEnemy se && se.isActive() && !se.isSwooping()) {
                     eligible.add(se);
                 }
+
             }
             if (!eligible.isEmpty()) {
                 SwoopingEnemy chosen = eligible.get(rand.nextInt(eligible.size()));
@@ -119,6 +135,24 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
         }
 
         for (Enemy enemy : enemies) enemy.update(); // Move enemies
+
+        // Check collision between hero and swooping enemies
+        for (Enemy enemy : enemies) {
+            if (enemy instanceof SwoopingEnemy) {
+                if (hero.getBounds().intersects(enemy.getBounds())) {
+                    long now = System.currentTimeMillis();
+                    if (now - hero.getLastHitTime() > 1000) { // 1000 ms = 1 second cooldown
+                        hero.takeHit(); // hero flashes or handles being hit
+                        lives--;
+                        hero.setLastHitTime(now);
+                        if (lives <= 0) {
+                            gameOver = true;
+                            timer.stop();
+                        }
+                    }
+                }
+            }
+        }
 
         // Check collision of bullets with hero
         for (int i = 0; i < enemyBullets.size(); i++) {
@@ -146,12 +180,25 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
                 Enemy enemy = enemies.get(j);
                 if (laser.getBounds().intersects(enemy.getBounds())) {
                     lasers.remove(i);
-                    enemies.remove(j);
                     i--;
-                    break; // One collision per laser
+
+                    if (enemy instanceof ShootingEnemy) {
+                        ShootingEnemy shootingEnemy = (ShootingEnemy) enemy;
+                        shootingEnemy.takeDamage();
+                        if (shootingEnemy.isDestroyed()) {
+                            enemies.remove(j);
+                            j--;
+                        }
+                    } else {
+                        enemies.remove(j);
+                        j--;
+                    }
+
+                    break; // laser can only hit one enemy
                 }
             }
         }
+
 
         // Advance to next wave if all enemies are defeated
         if (enemies.isEmpty()) {

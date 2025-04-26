@@ -20,4 +20,6 @@ public class EnemyBullet {
     public Rectangle getBounds() {
         return new Rectangle(x, y, 5, 10);
     }
+
+
 }
