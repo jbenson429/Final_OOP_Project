@@ -17,6 +17,7 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
     Random rand = new Random();             // Random number generator
     int lives = 3;                          // Player's remaining lives
     boolean gameOver = false;              // Game over state
+    int score = 0;
     int wave = 1;                           // Current enemy wave
     long lastSwoopTime = 0;                 // Last time an enemy swooped
     boolean capturingEnemySwooping = false; // Flag to prevent multiple simultaneous swoops
@@ -84,10 +85,11 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
         for (Laser laser : lasers) laser.draw(g);
         for (EnemyBullet bullet : enemyBullets) bullet.draw(g);
 
-        // UI: lives and wave number
+        // UI: lives and wave number and Score
         g.setColor(Color.WHITE);
         g.drawString("Lives: " + lives, 10, 20);
         g.drawString("Wave: " + wave, 700, 20);
+        g.drawString("Score: " + score, 400, 20);
 
         // Display temporary message
         if (!message.isEmpty()) {
@@ -99,6 +101,9 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
         if (gameOver) {
             g.setFont(new Font("Arial", Font.BOLD, 48));
             g.drawString("Game Over", 300, 300);
+            g.drawString("Score: " + score, 300, 350);
+            g.setFont(new Font("Arial", Font.PLAIN, 28));
+            g.drawString("Press Enter to continue", 280, 400);
         }
     }
 
@@ -161,10 +166,15 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
             if (bullet.getBounds().intersects(hero.getBounds())) {
                 enemyBullets.remove(i);
                 i--;
-                lives--;
-                if (lives <= 0) {
-                    gameOver = true;
-                    timer.stop();
+                long now = System.currentTimeMillis();
+                if (now - hero.getLastHitTime() > 1000) { // 1000 ms = 1 second cooldown
+                    hero.takeHit(); // hero flashes or handles being hit
+                    lives--;
+                    hero.setLastHitTime(now);
+                    if (lives <= 0) {
+                        gameOver = true;
+                        timer.stop();
+                    }
                 }
             }
         }
@@ -188,10 +198,12 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
                         if (shootingEnemy.isDestroyed()) {
                             enemies.remove(j);
                             j--;
+                            score += 100; // 100 points for shooting enemies
                         }
                     } else {
                         enemies.remove(j);
                         j--;
+                        score += 50; // 50 points for swooping enemies
                     }
 
                     break; // laser can only hit one enemy
@@ -216,7 +228,8 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_LEFT) hero.left = true;
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) hero.right = true;
         if (e.getKeyCode() == KeyEvent.VK_SPACE && !gameOver)
-            lasers.add(new Laser(hero.x + 20, hero.y)); // Fire laser from hero's position
+            lasers.add(new Laser(hero.x + 20, hero.y));// Fire laser from hero's position
+        if (e.getKeyCode() == KeyEvent.VK_ENTER && gameOver) resetGame(); // Restart the game
     }
 
     /**
@@ -230,6 +243,27 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
     public void keyTyped(KeyEvent e) {
         // Not used, required by KeyListener interface
     }
+
+    /**
+     * Method that resets everything to their base initialization
+     * Restarts the game
+     */
+    public void resetGame() {
+        hero = new Hero(375, 500);
+        enemies.clear();
+        lasers.clear();
+        enemyBullets.clear();
+        lives = 3;
+        wave = 1;
+        gameOver = false;
+        score = 0;
+        message = "";
+        hero.setLastHitTime(System.currentTimeMillis());
+
+        spawnWave(wave);
+        timer.start();
+    }
+
 
     /**
      * Main method to launch the game window.
