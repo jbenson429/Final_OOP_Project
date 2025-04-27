@@ -1,6 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -8,7 +12,7 @@ import java.util.Random;
  * Main game panel for a Galaga-style shooter game.
  * Implements game logic, rendering, and user input.
  */
-public class PlayGame extends JPanel implements ActionListener, KeyListener {
+public class PlayGame extends JPanel implements ActionListener, KeyListener{
     Timer timer;                            // Game loop timer
     Hero hero;                              // Player character
     ArrayList<Enemy> enemies = new ArrayList<>();          // List of enemies
@@ -25,6 +29,7 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
     long messageTimer = 0;                  // Timer for how long message is shown
     final static int BOARD_WIDTH = 800;
     final static int BOARD_HEIGHT = 600;
+    String[] highScores = new String[3];
     /**
      * Constructor to set up the game panel and initialize game objects.
      */
@@ -104,13 +109,18 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
             g.drawString("Score: " + score, 300, 350);
             g.setFont(new Font("Arial", Font.PLAIN, 28));
             g.drawString("Press Enter to continue", 280, 400);
+            //Draw the high scores
+            g.setFont(new Font("Arial", Font.PLAIN, 18));
+            g.drawString(highScores[0], 100, 200);
+            g.drawString(highScores[1], 100, 250);
+            g.drawString(highScores[2], 100, 300);
         }
     }
 
     /**
      * Game loop logic executed on each timer tick.
      */
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e){
         if (gameOver) return;
 
         hero.update();  // Move hero based on input
@@ -173,7 +183,13 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
                     hero.setLastHitTime(now);
                     if (lives <= 0) {
                         gameOver = true;
+                        try {
+                            highScores = afterGame();
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
                         timer.stop();
+
                     }
                 }
             }
@@ -262,6 +278,37 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
 
         spawnWave(wave);
         timer.start();
+    }
+
+
+    public String[] afterGame() throws IOException {
+    String contents  = Files.readString(Path.of("HighScores.txt"));
+    String[] names = contents.split("\n");
+    String[] scores = new String[3];
+    for (int i = 0; i < scores.length; i++) {
+        scores[i] = names[i].replace(names[i].substring(0,8), "");
+        names[i] = names[i].replace(names[i].substring(8), "");
+    }
+        int temp = this.score;
+    for (int i = 0; i < scores.length; i++) {
+
+        if (temp > Integer.parseInt(scores[i])) {
+            String temp2 = scores[i];
+            scores[i] = Integer.toString(temp);
+            temp = Integer.parseInt(temp2);
+        }
+    }
+    String[] scoreNames = new String[scores.length];
+    for (int i = 0; i < scores.length; i++) {
+        scoreNames[i] = names[i] + scores[i];
+    }
+
+    FileWriter writer = new FileWriter("HighScores.txt");
+    writer.write(scoreNames[0] + "\n");
+    writer.write(scoreNames[1] + "\n");
+    writer.write(scoreNames[2] + "\n");
+    writer.close();
+    return scoreNames;
     }
 
 
