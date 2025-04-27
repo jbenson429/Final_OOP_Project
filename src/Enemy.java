@@ -9,6 +9,9 @@ public abstract class Enemy {
     }
 
     public abstract void update();
+
+    //public abstract void update(Hero hero);
+
     public abstract void draw(Graphics g);
     public Rectangle getBounds() {
         return new Rectangle(x,y, 40, 40);

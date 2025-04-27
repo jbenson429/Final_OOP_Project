@@ -44,4 +44,13 @@ public class Hero {
         hit = true;
         hitTimer = System.currentTimeMillis();
     }
+
+    // Add these two methods to access y and height
+    public int getY() {
+        return y;
+    }
+
+    public int getHeight() {
+        return rectHeight;
+    }
 }

@@ -5,7 +5,7 @@ public class EnemyFactory {
         return switch (type.toLowerCase()) {
             case "swooping" -> new SwoopingEnemy(x, y, hero);
             case "shooting" -> new ShootingEnemy(x, y, enemyBullets);
-            //case "capturing" -> new CapturingEnemy(x, y);
+            case "capturing" -> new CapturingEnemy(x, y, hero);
             default -> throw new IllegalArgumentException("Unknown enemy type: " + type);
         };
     }
