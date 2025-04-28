@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.awt.*;
 
 public class CapturingEnemy extends Enemy {
@@ -12,6 +13,9 @@ public class CapturingEnemy extends Enemy {
     private static final int REQUIRED_HITS = 4;   // Number of hits to destroy
     private long lastActionTime;
     private static final int REPEAT_DELAY = 7000; // Delay before repeating the process
+    Image image;
+    private final int WIDTH = 40;
+    private final int HEIGHT = 40;
 
     public CapturingEnemy(int x, int y, Hero hero) {
         super(x, y); // Calls the parent Enemy constructor
@@ -19,6 +23,12 @@ public class CapturingEnemy extends Enemy {
         this.originalY = y;
         this.hero = hero;
         this.lastActionTime = System.currentTimeMillis(); // Set initial action time
+        ImageIcon heroIcon = new ImageIcon("Final_OOP_Project-master/Sprites/Galaga.png");
+        if (heroIcon.getImageLoadStatus() == MediaTracker.COMPLETE) {
+            image = heroIcon.getImage().getScaledInstance(WIDTH, HEIGHT, Image.SCALE_SMOOTH);
+        } else {
+            System.err.println("Image not found!");
+        }
     }
 
     @Override
@@ -75,9 +85,14 @@ public class CapturingEnemy extends Enemy {
     @Override
     public void draw(Graphics g) {
         if (active) {
-            // Get color based on the damage level
-            g.setColor(getColorBasedOnDamage());
-            g.fillRect(x, y, 40, 40); // 40x40 size for visual appearance
+            if (image != null) {
+                g.drawImage(image, x, y, null); // Draw the loaded image
+            } else {
+                // Fallback for if image fails to load
+                // Get color based on the damage level
+                g.setColor(getColorBasedOnDamage());
+                g.fillRect(x, y, 40, 40); // 40x40 size for visual appearance
+            }
         }
 
         // Stage 2: Drawing the beam when firing

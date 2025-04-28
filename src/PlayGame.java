@@ -225,7 +225,7 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_LEFT) hero.left = true;
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) hero.right = true;
-        if (e.getKeyCode() == KeyEvent.VK_SPACE && !gameOver) lasers.add(new Laser(hero.x + 20, hero.y));
+        if (e.getKeyCode() == KeyEvent.VK_SPACE && !gameOver) lasers.add(new Laser(hero.x + 23, hero.y));
         if (e.getKeyCode() == KeyEvent.VK_ENTER && gameOver) resetGame();
     }
 

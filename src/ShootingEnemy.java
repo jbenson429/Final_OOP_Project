@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
@@ -8,11 +9,20 @@ public class ShootingEnemy extends Enemy {
     private Color currentColor;     // The color of the enemy
     Random random = new Random();
     ArrayList<EnemyBullet> enemyBullets;
+    Image image;
+    private final int WIDTH = 40;
+    private final int HEIGHT = 40;
 
     public ShootingEnemy(int x, int y, ArrayList<EnemyBullet> enemyBullets) {
         super(x, y);
         this.enemyBullets = enemyBullets;
         this.currentColor = Color.RED; // Initial color is red
+        ImageIcon heroIcon = new ImageIcon("Final_OOP_Project-master/Sprites/Galaxian.png");
+        if (heroIcon.getImageLoadStatus() == MediaTracker.COMPLETE) {
+            image = heroIcon.getImage().getScaledInstance(WIDTH, HEIGHT, Image.SCALE_SMOOTH);
+        } else {
+            System.err.println("Image not found!");
+        }
     }
 
     @Override
@@ -33,8 +43,13 @@ public class ShootingEnemy extends Enemy {
 
     @Override
     public void draw(Graphics g) {
-        g.setColor(currentColor); // Use the current color
-        g.fillRect(x, y, 40, 40);
+        if (image != null) {
+            g.drawImage(image, x, y, null); // Draw the loaded image
+        } else {
+            // Fallback for if image fails to load
+            g.setColor(currentColor); // Use the current color
+            g.fillRect(x, y, 40, 40);
+        }
     }
 
     public void takeDamage() {

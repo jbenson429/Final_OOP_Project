@@ -14,10 +14,10 @@ public class Laser {
 
     public void draw(Graphics g) {
         g.setColor(Color.YELLOW);
-        g.fillRect(x, y, 5, 10);
+        g.fillRect(x, y, 4, 10);
     }
 
     public Rectangle getBounds() {
-        return new Rectangle(x, y, 5, 10);
+        return new Rectangle(x, y, 4, 10);
     }
 }

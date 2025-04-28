@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.awt.*;
 
 public class Hero {
@@ -5,13 +6,20 @@ public class Hero {
     boolean left, right;
     boolean hit = false;
     long hitTimer = 0;
-    int rectWidth = 50;
-    int rectHeight = 20;
+    Image image;
+    private final int WIDTH = 50;
+    private final int HEIGHT = 53;
     private long lastHitTime = 0;
 
     public Hero(int x, int y) {
         this.x = x;
         this.y = y;
+        ImageIcon heroIcon = new ImageIcon("Final_OOP_Project-master/Sprites/Player.png");
+        if (heroIcon.getImageLoadStatus() == MediaTracker.COMPLETE) {
+            image = heroIcon.getImage().getScaledInstance(WIDTH, HEIGHT, Image.SCALE_SMOOTH);
+        } else {
+            System.err.println("Image not found!");
+        }
     }
 
     public void update() {
@@ -20,12 +28,17 @@ public class Hero {
     }
 
     public void draw(Graphics g) {
-        if (hit && System.currentTimeMillis() - hitTimer < 300) {
-            g.setColor(Color.RED);
+        if (image != null) {
+            g.drawImage(image, x, y, null); // Draw the loaded image
         } else {
-            g.setColor(Color.GREEN); // or whatever normal color you want
+            // Fallback for if image fails to load
+            if (hit && System.currentTimeMillis() - hitTimer < 300) {
+                g.setColor(Color.RED);
+            } else {
+                g.setColor(Color.GREEN); // or whatever normal color you want
+            }
+            g.fillRect(x, y, 50, 20);
         }
-        g.fillRect(x, y, rectWidth, rectHeight);
     }
 
     public Rectangle getBounds() {
@@ -51,6 +64,11 @@ public class Hero {
     }
 
     public int getHeight() {
-        return rectHeight;
+        if(image != null) {
+            return HEIGHT;
+        }
+        else{
+            return 20;
+        }
     }
 }
