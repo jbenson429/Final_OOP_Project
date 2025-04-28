@@ -15,14 +15,18 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
     private ArrayList<Laser> lasers = new ArrayList<>();
     private ArrayList<EnemyBullet> enemyBullets = new ArrayList<>();
     private Random rand = new Random();
+    private JTextField textField = new JTextField();
+    private JButton startButton = new JButton("Start");
 
     private int lives = 3;
     private boolean gameOver = false;
+    private boolean gameStart = false;
     private int score = 0;
     private int wave = 1;
     private long lastSwoopTime = 0;
     private String message = "";
     private long messageTimer = 0;
+    private String playerName = "";
 
     public static final int BOARD_WIDTH = 800;
     public static final int BOARD_HEIGHT = 600;
@@ -31,6 +35,7 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
 
     public PlayGame() {
         setFocusable(true);
+        setLayout(null);
         setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT));
         setBackground(Color.BLACK);
         addKeyListener(this);
@@ -38,8 +43,29 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
         hero = new Hero(375, 500);
         spawnWave(wave);
 
-        timer = new Timer(20, this);
-        timer.start();
+        // Set the textField for the name
+        textField.setBounds(320, 350, 200,30);
+        textField.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+        this.add(textField);
+
+        // Add the start button
+        startButton.setBounds(375, 300, 100,30);
+        startButton.addActionListener(e -> {  playerName = textField.getText().toUpperCase();
+            // get the first three characters
+            if (playerName.length() > 3) playerName = playerName.substring(0, 3);
+            // Remove the textField and startButton when the game starts
+            textField.setVisible(false);
+            textField.setFocusable(false);
+            startButton.setFocusable(false);
+            startButton.setVisible(false);
+
+            // Start the game
+            gameStart = true;
+            timer = new Timer(20, this);
+            timer.start();});
+
+        this.add(startButton);
+
     }
 
     private void spawnWave(int wave) {
@@ -87,12 +113,18 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
         g.drawString("Wave: " + wave, 700, 20);
         g.drawString("Score: " + score, 400, 20);
 
+        if(!gameStart) {
+            g.setFont(new Font("Arial", Font.PLAIN, 20));
+            g.drawString("Name:",250,375);
+        }
+
         if (!message.isEmpty()) {
             g.setFont(new Font("Arial", Font.BOLD, 24));
             g.drawString(message, 300, 280);
         }
 
         if (gameOver) {
+            // Display text for the end of the game
             g.setFont(new Font("Arial", Font.BOLD, 48));
             g.drawString("Game Over", 300, 300);
             g.drawString("Score: " + score, 300, 350);
@@ -193,6 +225,7 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
                         ce.takeDamage();
                         if (ce.isDestroyed()) {
                             enemies.remove(j);
+                            score += 150;
                         }
                     } else {
                         enemies.remove(j);
@@ -212,6 +245,7 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
             if (lives <= 0) {
                 gameOver = true;
                 timer.stop();
+                repaint();
                 try {
                     highScores = afterGame();
                 } catch (IOException ex) {
@@ -276,11 +310,15 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
 
         // Step 3: Update scores
         int tempScore = score;
+        String tempName = playerName;
         for (int i = 0; i < 3; i++) {
             if (tempScore > Integer.parseInt(scores[i])) {
-                int swap = Integer.parseInt(scores[i]);
+                int scoreSwap = Integer.parseInt(scores[i]);
+                String nameSwap = names[i];
                 scores[i] = Integer.toString(tempScore);
-                tempScore = swap;
+                names[i] = tempName;
+                tempScore = scoreSwap;
+                tempName = nameSwap;
             }
         }
 
