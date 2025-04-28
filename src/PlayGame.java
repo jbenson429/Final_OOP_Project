@@ -24,6 +24,7 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
     private int score = 0;
     private int wave = 1;
     private long lastSwoopTime = 0;
+    private long lastShotTime = 0;
     private String message = "";
     private long messageTimer = 0;
     private String playerName = "";
@@ -257,9 +258,17 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        int LASER_BUFFER = 150;
+        int LASER_POS = 23;
         if (e.getKeyCode() == KeyEvent.VK_LEFT) hero.left = true;
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) hero.right = true;
-        if (e.getKeyCode() == KeyEvent.VK_SPACE && !gameOver) lasers.add(new Laser(hero.x + 23, hero.y));
+        if (e.getKeyCode() == KeyEvent.VK_SPACE && !gameOver) {
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - lastShotTime > LASER_BUFFER) { // 500 milliseconds = half a second cooldown
+                lasers.add(new Laser(hero.x + LASER_POS, hero.y));
+                lastShotTime = currentTime;
+            }
+        }
         if (e.getKeyCode() == KeyEvent.VK_ENTER && gameOver) resetGame();
     }
 
@@ -273,6 +282,7 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
     public void keyTyped(KeyEvent e) {}
 
     private void resetGame() {
+
         hero = new Hero(375, 500);
         enemies.clear();
         lasers.clear();
