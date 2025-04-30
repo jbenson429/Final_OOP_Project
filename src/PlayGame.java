@@ -15,6 +15,7 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
     private ArrayList<Laser> lasers = new ArrayList<>();
     private ArrayList<EnemyBullet> enemyBullets = new ArrayList<>();
     private Random rand = new Random();
+    private Image logo;
     private JTextField textField = new JTextField();
     private JButton startButton = new JButton("Start");
 
@@ -43,6 +44,14 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
 
         hero = new Hero(375, 500);
         spawnWave(wave);
+
+        // Galaga main menu logo
+        ImageIcon logoIcon = new ImageIcon("Sprites/MainLogo.jpg");
+        if (logoIcon.getImageLoadStatus() == MediaTracker.COMPLETE) {
+            logo = logoIcon.getImage().getScaledInstance(360, 180, Image.SCALE_SMOOTH);
+        } else {
+            System.err.println("Image not found!");
+        }
 
         // Set the textField for the name
         textField.setBounds(320, 350, 200,30);
@@ -117,6 +126,10 @@ public class PlayGame extends JPanel implements ActionListener, KeyListener {
         if(!gameStart) {
             g.setFont(new Font("Arial", Font.PLAIN, 20));
             g.drawString("Name:",250,375);
+            // Draws the Main Logo if image is found and the game hasn't started
+            if (logo != null) {
+                g.drawImage(logo, (BOARD_WIDTH - logo.getWidth(this)) / 2, 100, this);
+            }
         }
 
         if (!message.isEmpty()) {

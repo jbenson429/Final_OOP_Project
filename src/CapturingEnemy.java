@@ -23,7 +23,7 @@ public class CapturingEnemy extends Enemy {
         this.originalY = y;
         this.hero = hero;
         this.lastActionTime = System.currentTimeMillis(); // Set initial action time
-        ImageIcon heroIcon = new ImageIcon("Final_OOP_Project-master/Sprites/Galaga.png");
+        ImageIcon heroIcon = new ImageIcon("Sprites/Galaga.png");
         if (heroIcon.getImageLoadStatus() == MediaTracker.COMPLETE) {
             image = heroIcon.getImage().getScaledInstance(WIDTH, HEIGHT, Image.SCALE_SMOOTH);
         } else {

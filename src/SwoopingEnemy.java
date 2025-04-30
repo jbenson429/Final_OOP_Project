@@ -31,10 +31,10 @@ public class SwoopingEnemy extends Enemy {
         ImageIcon swoopingIcon;
         int randNum = rand.nextInt(1, 11); // for getting a variety of enemies
         if ((randNum % 2) == 0) {
-            swoopingIcon = new ImageIcon("Final_OOP_Project-master/Sprites/Wasp.png");
+            swoopingIcon = new ImageIcon("Sprites/Wasp.png");
         }
         else {
-            swoopingIcon = new ImageIcon("Final_OOP_Project-master/Sprites/Butterfly.png");
+            swoopingIcon = new ImageIcon("Sprites/Butterfly.png");
         }
 
         if (swoopingIcon.getImageLoadStatus() == MediaTracker.COMPLETE) {

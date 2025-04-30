@@ -14,7 +14,7 @@ public class Hero {
     public Hero(int x, int y) {
         this.x = x;
         this.y = y;
-        ImageIcon heroIcon = new ImageIcon("Final_OOP_Project-master/Sprites/Player.png");
+        ImageIcon heroIcon = new ImageIcon("Sprites/Player.png");
         if (heroIcon.getImageLoadStatus() == MediaTracker.COMPLETE) {
             image = heroIcon.getImage().getScaledInstance(WIDTH, HEIGHT, Image.SCALE_SMOOTH);
         } else {

@@ -17,7 +17,7 @@ public class ShootingEnemy extends Enemy {
         super(x, y);
         this.enemyBullets = enemyBullets;
         this.currentColor = Color.RED; // Initial color is red
-        ImageIcon heroIcon = new ImageIcon("Final_OOP_Project-master/Sprites/Galaxian.png");
+        ImageIcon heroIcon = new ImageIcon("Sprites/Galaxian.png");
         if (heroIcon.getImageLoadStatus() == MediaTracker.COMPLETE) {
             image = heroIcon.getImage().getScaledInstance(WIDTH, HEIGHT, Image.SCALE_SMOOTH);
         } else {
